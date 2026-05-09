@@ -42,10 +42,12 @@ The script requires a clean working tree and an existing `github` remote.
 
 ## Hosting
 
-- **Host:** Cloudflare Pages (decided in [SHI-178](https://linear.app/shiny-guru/issue/SHI-178))
+- **Host:** Cloudflare (Workers + Static Assets — formerly Pages, decided in [SHI-178](https://linear.app/shiny-guru/issue/SHI-178))
 - **DNS:** `usecook.com` on Cloudflare nameservers ([SHI-179](https://linear.app/shiny-guru/issue/SHI-179))
 - **Stand-up:** [SHI-180](https://linear.app/shiny-guru/issue/SHI-180)
 - **Project:** [Cook distribution infra — rocks index + installer hosting](https://linear.app/shiny-guru/project/cook-distribution-infra-rocks-index-installer-hosting-9ee27f58483d)
+
+`wrangler.jsonc` declares this as a static-only project (`assets.directory = "./"`); `.assetsignore` keeps tooling files (`scripts/`, `README.md`, the wrangler config itself) out of what's served. Each push to the GitHub mirror triggers `npx wrangler deploy` in Cloudflare's CI.
 
 ## Known limitations (v1)
 
