@@ -16,7 +16,7 @@ fi
 
 if ! git remote get-url "$REMOTE" >/dev/null 2>&1; then
   echo "error: no remote named '$REMOTE'. Add one with:" >&2
-  echo "  git remote add $REMOTE git@github.com:liora-labs/cook-rocks-index.git" >&2
+  echo "  git remote add $REMOTE git@github.com:LioraLabs/cook-rocks-index.git" >&2
   exit 1
 fi
 

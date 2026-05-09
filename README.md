@@ -15,7 +15,7 @@ No server-side compute, no auth. The site is the repo.
 
 ## How rocks land here
 
-1. Author or update a rockspec in its own source repo (e.g. `liora-labs/cook-cpp`).
+1. Author or update a rockspec in its own source repo (e.g. `LioraLabs/cook-cpp`).
 2. `luarocks pack <rockspec>` to produce a `.src.rock` (and binary rocks per platform).
 3. Commit the `.rockspec` + `.src.rock` files into this repo on Gitea.
 4. Regenerate the manifest: `luarocks-admin make-manifest .` and commit.
@@ -27,7 +27,7 @@ The Phase 4 publishing workflow in [SHI-176](https://linear.app/shiny-guru/issue
 ## Repo topology
 
 - **Gitea (NAS) — canonical.** Real commit history. All authoring happens here.
-- **GitHub mirror (`liora-labs/cook-rocks-index`) — single-commit snapshot.** Each publish replaces `main` with one orphan commit holding the current tree. No history is preserved on the GitHub side; Cloudflare Pages reads from this mirror.
+- **GitHub mirror (`LioraLabs/cook-rocks-index`) — single-commit snapshot.** Each publish replaces `main` with one orphan commit holding the current tree. No history is preserved on the GitHub side; Cloudflare Pages reads from this mirror.
 - **Cloudflare Pages.** Bound to the GitHub mirror's `main` branch; redeploys on each force-push.
 
 To publish:
