@@ -1,0 +1,35 @@
+# Cookfile for cook-rocks-index — the rocks.usecook.com source repo.
+#
+# This repo is canonical on Gitea (full history) and mirrored to
+# LioraLabs/cook-rocks-index on GitHub as a single orphan-commit snapshot.
+# Cloudflare Workers + Static Assets reads from the GitHub mirror and
+# serves rocks.usecook.com.
+#
+# Quick reference:
+#   cook publish     - push to Gitea then force-push orphan snapshot to GitHub
+#   cook manifest    - regenerate manifest-5.4 from rockspecs in this dir
+#   cook smoke       - verify rocks.usecook.com serves the live manifest
+#   cook check       - parse-check publish.sh (CI gate)
+
+# Push canonical history to Gitea, then refresh the GitHub mirror's single
+# orphan-commit snapshot. Requires: working tree clean, `origin` (Gitea) and
+# `github` remotes configured.
+chore publish
+    git push origin main
+    scripts/publish.sh
+
+# Rebuild manifest-5.4 from every .rockspec / .src.rock in this directory.
+# Requires luarocks installed locally.
+chore manifest
+    luarocks-admin make-manifest .
+
+# Smoke test the live site. Verifies the manifest is reachable and the
+# Cloudflare deploy is still healthy.
+chore smoke
+    @curl -sI https://rocks.usecook.com/manifest-5.4
+    @echo
+    @curl -sSL https://rocks.usecook.com/manifest-5.4
+
+# Parse-check shell scripts. Cheap pre-commit gate.
+chore check
+    bash -n scripts/publish.sh
