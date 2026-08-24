@@ -279,6 +279,16 @@ repository = {
          }
       }
    },
+   cook_dotnet = {
+      ["0.1.0-1"] = {
+         {
+            arch = "src"
+         },
+         {
+            arch = "rockspec"
+         }
+      }
+   },
    cook_pnpm = {
       ["0.0.1-1"] = {
          {
