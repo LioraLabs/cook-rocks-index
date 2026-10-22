@@ -6,7 +6,7 @@
 #
 # Quick reference:
 #   cook publish     - push main to GitHub (triggers the Cloudflare deploy)
-#   cook manifest    - regenerate manifest-5.4 from rockspecs in this dir
+#   cook manifest    - regenerate manifest-5.4 and index.html from the rockspecs here
 #   cook smoke       - verify rocks.usecook.com serves the live manifest
 
 chore publish
@@ -16,6 +16,7 @@ chore publish
 # Requires luarocks installed locally.
 chore manifest
     luarocks-admin make-manifest .
+    node scripts/index.mjs
 
 # Smoke test the live site. Verifies the manifest is reachable and the
 # Cloudflare deploy is still healthy.
