@@ -2,7 +2,8 @@
 // which overwrites index.html with its own page. Node only; no dependencies.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 const dir = new URL('..', import.meta.url).pathname;
-const notes = { cook_ai: 'deprecated', cook_smoke: 'fixture', cook_cpp: 'reserved name' }; // not part of the catalogue
+const hidden = new Set(['cook_ai', 'cook_smoke', 'cook_cpp']); // deprecated, fixture, reserved name: still installable, not catalogued
+const notes = {};
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const field = (src, key) => src.match(new RegExp(`^\\s*${key}\\s*=\\s*"([^"]*)"`, 'm'))?.[1] ?? '';
 const semver = v => v.split(/[.-]/).map(Number);
@@ -18,10 +19,11 @@ for (const f of readdirSync(dir).filter(f => f.endsWith('.rockspec')).sort()) {
   r.versions.push({ version, summary: field(src, 'summary'), detailed, deps, homepage: field(src, 'homepage'), file: f });
   rocks.set(name, r);
 }
+for (const h of hidden) rocks.delete(h);
 const list = [...rocks.values()].map(r => ({ ...r, versions: r.versions.sort((a, b) => newer(a.version, b.version)) })).sort((a, b) => (notes[a.name] ? 1 : 0) - (notes[b.name] ? 1 : 0) || a.name.localeCompare(b.name));
 
 const tile = (r, k) => { const v = r.versions[0]; return `
-<section class="tile${notes[r.name] ? ' dim' : ''}" style="--k:${k}">
+<section class="tile${notes[r.name] ? ' dim' : ''}" id="${esc(r.name)}" style="--k:${k}">
   <span class="kicker">${esc(v.version)} · ${r.versions.length} release${r.versions.length > 1 ? 's' : ''}${notes[r.name] ? ` · ${notes[r.name]}` : ''}</span>
   <h2>${esc(r.name)}</h2>
   <p class="summary">${esc(v.summary)}</p>
@@ -31,7 +33,8 @@ const tile = (r, k) => { const v = r.versions[0]; return `
 ${esc(r.name)} = <span class="s">"${esc(v.version)}"</span></pre>
   <div class="meta">
     ${v.deps.length ? `<span>needs ${v.deps.map(esc).join(', ')}</span>` : ''}
-    ${v.homepage ? `<a href="${esc(v.homepage)}">source</a>` : ''}
+    <a href="https://docs.usecook.com/n/modules/${esc(r.name)}">docs</a>
+    ${v.homepage ? `<a href="${esc(v.homepage)}/tree/main/${esc(r.name)}">source</a>` : ''}
     <details><summary>all versions</summary><ul>${r.versions.map(x => `<li><a href="${esc(x.file)}">${esc(x.version)}</a> <a class="rock" href="${esc(x.file.replace(/\.rockspec$/, '.src.rock'))}">.src.rock</a></li>`).join('')}</ul></details>
   </div>
 </section>`; };
@@ -80,7 +83,7 @@ details{flex-basis:100%}summary{cursor:pointer;color:var(--muted)}details ul{lis
 <h1>cook's blessed modules</h1>
 <p class="lede">This is the LuaRocks index <code>cook</code> installs modules from. Pin a version under <code>[modules]</code> in <code>cook.toml</code>, add <code>use cook_cc</code> to your Cookfile, and cook fetches the rock itself. Every module contributes ordinary units to the same graph and the same cache.</p>
 <div class="tiles">${list.map(tile).join('\n')}</div>
-<p class="foot">Index: <a href="manifest-5.4">manifest-5.4</a> · ${list.length} packages, ${[...rocks.values()].reduce((n, r) => n + r.versions.length, 0)} releases · Apache-2.0 and MIT · <a href="https://lioralabs.dev">Liora Labs</a></p>
+<p class="foot">Index: <a href="manifest-5.4">manifest-5.4</a> · ${list.length} modules, ${[...rocks.values()].reduce((n, r) => n + r.versions.length, 0)} releases · Apache-2.0 and MIT · <a href="https://lioralabs.dev">Liora Labs</a></p>
 </main>
 </body>
 </html>
